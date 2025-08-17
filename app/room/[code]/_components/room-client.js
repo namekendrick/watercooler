@@ -26,22 +26,22 @@ export const RoomClient = ({ roomCode, defaultOpen }) => {
     getParticipantsWithResponses,
   } = useDailyQuestionState();
 
-  // Determine if this is a room from a previous day
   const roomQuestion = room?.participants?.find((p) => p.response?.question)
     ?.response?.question;
 
   const isHistoricalRoom =
     roomQuestion && currentQuestion && roomQuestion.id !== currentQuestion.id;
 
+  const isCheckingRoomType = roomQuestion && !currentQuestion;
+
   useEffect(() => {
     if (!isLoading && !room) redirect("/");
   }, [isLoading, room]);
 
   useEffect(() => {
-    // Automatically select a random participant to view for historical rooms
-    if (isHistoricalRoom) {
+    if (isHistoricalRoom && room?.participants) {
       const participantsWithResponses = getParticipantsWithResponses(
-        room?.participants || []
+        room.participants
       );
 
       if (
@@ -62,7 +62,7 @@ export const RoomClient = ({ roomCode, defaultOpen }) => {
     isViewingParticipantResponse,
   ]);
 
-  if (isLoading) {
+  if (isLoading || isCheckingRoomType) {
     return (
       <SidebarProvider defaultOpen={defaultOpen}>
         <div className="flex h-screen">

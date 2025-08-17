@@ -9,27 +9,33 @@ import { Button } from "@/components/ui/button";
 import { Form, FormControl, FormField, FormItem } from "@/components/ui/form";
 import { Textarea } from "@/components/ui/textarea";
 import { useSaveResponse } from "@/features/daily/api/use-save-response";
+import { AddParticipantForm } from "@/features/daily/components/add-participant-form";
 import { useDailyQuestionState } from "@/features/daily/hooks/use-daily-question-state";
 import { useDailyQuestion } from "@/features/daily/providers/daily-question-provider";
 import { saveResponseSchema } from "@/features/daily/schemas";
 
 export const DailyQuestion = ({ room }) => {
   const { currentQuestion } = useDailyQuestion();
-  const { getCurrentParticipantId } = useDailyQuestionState();
+  const { getCurrentParticipantId, isParticipantInRoom, hasHydrated } =
+    useDailyQuestionState();
   const { mutate: saveResponseMutation } = useSaveResponse();
   const [isEditing, setIsEditing] = useState(false);
 
   const currentParticipantId = getCurrentParticipantId(room?.code);
+  const isUserInRoom = hasHydrated ? isParticipantInRoom(room?.code) : false;
   const currentParticipant = room?.participants?.find(
     (participant) => participant.id === currentParticipantId
   );
   const existingResponse = currentParticipant?.response;
 
-  // Use the room's question if available (for historical rooms), otherwise use current question
   const roomQuestion =
     existingResponse?.question ||
     room?.participants?.find((p) => p.response?.question)?.response?.question;
+
   const question = roomQuestion || currentQuestion;
+
+  const isHistoricalRoom =
+    roomQuestion && currentQuestion && roomQuestion.id !== currentQuestion.id;
 
   const form = useForm({
     resolver: zodResolver(saveResponseSchema),
@@ -60,6 +66,9 @@ export const DailyQuestion = ({ room }) => {
   const handleEditClick = () => setIsEditing(true);
 
   if (!question) return null;
+
+  if (!isUserInRoom && !isHistoricalRoom && hasHydrated && currentQuestion)
+    return <AddParticipantForm room={room} />;
 
   const isFormDisabled =
     !currentParticipantId || (existingResponse && !isEditing);

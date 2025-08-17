@@ -2,7 +2,6 @@
 
 import { Shuffle, Plus } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useEffect } from "react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
@@ -21,7 +20,6 @@ export const ParticipantResponse = ({ room }) => {
     getNextRandomParticipant,
     markParticipantAsViewed,
     getParticipantsWithResponses,
-    isLastUnviewedParticipant,
     getViewedParticipantIds,
   } = useDailyQuestionState();
 
@@ -29,36 +27,13 @@ export const ParticipantResponse = ({ room }) => {
     (p) => p.id === viewingParticipantId
   );
 
-  // Use the room's question if available (for historical rooms), otherwise use current question
   const roomQuestion =
     participant?.response?.question ||
     room?.participants?.find((p) => p.response?.question)?.response?.question;
   const question = roomQuestion || currentQuestion;
 
-  // Determine if this is a room from a previous day
   const isHistoricalRoom =
     roomQuestion && currentQuestion && roomQuestion.id !== currentQuestion.id;
-
-  // Auto-select a participant for initial view if none selected
-  useEffect(() => {
-    if (hasHydrated && !viewingParticipantId && room?.participants) {
-      const participantsWithResponses = getParticipantsWithResponses(
-        room.participants
-      );
-      if (participantsWithResponses.length > 0) {
-        const randomIndex = Math.floor(
-          Math.random() * participantsWithResponses.length
-        );
-        setViewingParticipantId(participantsWithResponses[randomIndex].id);
-      }
-    }
-  }, [
-    hasHydrated,
-    viewingParticipantId,
-    room,
-    getParticipantsWithResponses,
-    setViewingParticipantId,
-  ]);
 
   const { displayedText, isTyping } = useTypewriter(
     participant?.response?.text
@@ -68,7 +43,6 @@ export const ParticipantResponse = ({ room }) => {
     if (!room?.participants || !hasHydrated || !room?.code || !participant?.id)
       return;
 
-    // Get next random participant, excluding current participant when restarting
     const nextParticipant = getNextRandomParticipant(
       room.participants,
       room.code,
@@ -76,13 +50,10 @@ export const ParticipantResponse = ({ room }) => {
     );
 
     if (nextParticipant) {
-      // Switch to viewing the next participant
       setViewingParticipantId(nextParticipant.id);
 
-      // Mark the next participant as viewed (the one we're now viewing)
       markParticipantAsViewed(nextParticipant.id, room.code);
 
-      // Check if we've now seen all responses by comparing viewed count to total responses
       const viewedIds = getViewedParticipantIds(room.code);
       const totalResponses = getParticipantsWithResponses(
         room.participants
@@ -96,19 +67,16 @@ export const ParticipantResponse = ({ room }) => {
 
   const handleCreateNewRoom = () => router.push("/");
 
-  // Get participants with responses for button state
   const participantsWithResponses = getParticipantsWithResponses(
     room?.participants || []
   );
   const hasMultipleResponses = participantsWithResponses.length > 1;
 
-  // Check if shuffle has started (any participants have been viewed)
   const viewedIds = room?.code ? getViewedParticipantIds(room.code) : [];
   const hasShuffleStarted = viewedIds.length > 0;
 
   if (!question) return null;
 
-  // Show a message if there are no responses yet
   if (participantsWithResponses.length === 0) {
     return (
       <div className="w-full h-full flex flex-col items-center justify-center">
