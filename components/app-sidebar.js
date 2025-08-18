@@ -17,7 +17,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useRemoveParticipant } from "@/features/daily/api/use-remove-participant";
 import { useDailyQuestionState } from "@/features/daily/hooks/use-daily-question-state";
 import { useDailyQuestion } from "@/features/daily/providers/daily-question-provider";
-import { cn } from "@/lib/utils";
+import { cn, formatRoomCreationDate } from "@/lib/utils";
 
 export const AppSidebar = ({ room }) => {
   const { mutate: removeParticipant } = useRemoveParticipant();
@@ -51,7 +51,7 @@ export const AppSidebar = ({ room }) => {
             Participants
             {isHistoricalRoom && (
               <span className="ml-2 text-xs text-gray-500 font-normal">
-                (Read-only)
+                ({formatRoomCreationDate(room.createdAt)})
               </span>
             )}
           </SidebarGroupLabel>
