@@ -1,6 +1,6 @@
 "use client";
 
-import { Shuffle, Plus } from "lucide-react";
+import { Shuffle, Plus, ArrowRight } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 
@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { useDailyQuestionState } from "@/features/daily/hooks/use-daily-question-state";
 import { useDynamicFontSize } from "@/features/daily/hooks/use-dynamic-font-size";
 import { useTypewriter } from "@/features/daily/hooks/use-typewriter";
+import { useUnscrambleText } from "@/features/daily/hooks/use-unscramble-text";
 import { useDailyQuestion } from "@/features/daily/providers/daily-question-provider";
 
 export const ParticipantResponse = ({ room }) => {
@@ -23,6 +24,13 @@ export const ParticipantResponse = ({ room }) => {
     getParticipantsWithResponses,
     getViewedParticipantIds,
   } = useDailyQuestionState();
+
+  const {
+    displayText: unscrambleText,
+    isUnscrambling,
+    isFinished: isUnscrambleFinished,
+    startUnscramble,
+  } = useUnscrambleText();
 
   const participant = room?.participants?.find(
     (p) => p.id === viewingParticipantId
@@ -63,12 +71,17 @@ export const ParticipantResponse = ({ room }) => {
       ).length;
 
       if (viewedIds.length === totalResponses) {
-        toast.success("You've seen all responses!");
+        toast.success("You've seen all the responses!");
       }
     }
   };
 
   const handleCreateNewRoom = () => router.push("/");
+
+  const handleRevealPerson = () => {
+    if (!participant?.name) return;
+    startUnscramble(participant.name);
+  };
 
   const participantsWithResponses = getParticipantsWithResponses(
     room?.participants || []
@@ -113,29 +126,45 @@ export const ParticipantResponse = ({ room }) => {
       <div
         className={`${fontSizeClasses} font-black text-gray-900 tracking-tight leading-tight text-center max-w-4xl ${minHeightClass} flex items-center justify-center px-4`}
       >
-        <span>{displayedText}</span>
+        <span className={isUnscrambleFinished ? "rainbow-text" : ""}>
+          {unscrambleText || displayedText}
+        </span>
       </div>
       {(hasMultipleResponses || isHistoricalRoom) && (
-        <Button
-          disabled={isTyping || !hasHydrated}
-          variant="outline"
-          className="mt-8 mb-4"
-          onClick={isHistoricalRoom ? handleCreateNewRoom : handleNextResponse}
-        >
-          {isHistoricalRoom ? (
-            <>
-              <Plus className="mr-2 h-4 w-4" />
-              Create New Room
-            </>
-          ) : hasShuffleStarted ? (
-            "Next Response"
-          ) : (
-            <>
-              <Shuffle className="mr-2 h-4 w-4" />
-              Start Shuffle
-            </>
+        <div className="flex flex-col min-w-md gap-3 mt-8 mb-4">
+          {!isHistoricalRoom && hasShuffleStarted && (
+            <Button
+              disabled={isTyping || !hasHydrated || isUnscrambling}
+              onClick={handleRevealPerson}
+            >
+              Reveal Person
+            </Button>
           )}
-        </Button>
+          <Button
+            disabled={isTyping || !hasHydrated || isUnscrambling}
+            variant="outline"
+            onClick={
+              isHistoricalRoom ? handleCreateNewRoom : handleNextResponse
+            }
+          >
+            {isHistoricalRoom ? (
+              <>
+                <Plus className="mr-2 h-4 w-4" />
+                Create New Room
+              </>
+            ) : hasShuffleStarted ? (
+              <>
+                Next Response
+                <ArrowRight className="h-4 w-4" />
+              </>
+            ) : (
+              <>
+                <Shuffle className="mr-2 h-4 w-4" />
+                Start Shuffle
+              </>
+            )}
+          </Button>
+        </div>
       )}
     </div>
   );
