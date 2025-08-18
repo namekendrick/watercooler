@@ -6,6 +6,7 @@ import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import { useDailyQuestionState } from "@/features/daily/hooks/use-daily-question-state";
+import { useDynamicFontSize } from "@/features/daily/hooks/use-dynamic-font-size";
 import { useTypewriter } from "@/features/daily/hooks/use-typewriter";
 import { useDailyQuestion } from "@/features/daily/providers/daily-question-provider";
 
@@ -38,6 +39,8 @@ export const ParticipantResponse = ({ room }) => {
   const { displayedText, isTyping } = useTypewriter(
     participant?.response?.text
   );
+
+  const { fontSizeClasses, minHeightClass } = useDynamicFontSize(displayedText);
 
   const handleNextResponse = () => {
     if (!room?.participants || !hasHydrated || !room?.code || !participant?.id)
@@ -79,17 +82,17 @@ export const ParticipantResponse = ({ room }) => {
 
   if (participantsWithResponses.length === 0) {
     return (
-      <div className="w-full h-full flex flex-col items-center justify-center">
-        <p className="text-lg md:text-xl text-gray-500 font-medium max-w-3xl">
+      <div className="w-full h-full flex flex-col items-center justify-center p-4 pb-8">
+        <p className="text-lg md:text-xl text-gray-500 font-medium max-w-3xl text-center mb-8">
           {question.text}
         </p>
-        <div className="text-3xl md:text-4xl font-black text-gray-400 tracking-tight leading-none text-center max-w-4xl mt-8">
+        <div className="text-3xl md:text-4xl font-black text-gray-400 tracking-tight leading-none text-center max-w-4xl">
           No responses yet
         </div>
         {isHistoricalRoom && (
           <Button
             variant="outline"
-            className="mt-8"
+            className="mt-8 mb-4"
             onClick={handleCreateNewRoom}
           >
             <Plus className="mr-2 h-4 w-4" />
@@ -103,18 +106,20 @@ export const ParticipantResponse = ({ room }) => {
   if (!participant || !participant.response?.text) return null;
 
   return (
-    <div className="w-full h-full flex flex-col items-center justify-center">
-      <p className="text-lg md:text-xl text-gray-500 font-medium max-w-3xl">
+    <div className="w-full h-full flex flex-col items-center justify-center p-4 pb-8">
+      <p className="text-lg md:text-xl text-gray-500 font-medium max-w-3xl text-center mb-8">
         {question.text}
       </p>
-      <div className="text-6xl md:text-7xl font-black text-gray-900 tracking-tight leading-none text-center max-w-4xl min-h-[150px] flex items-center justify-center">
+      <div
+        className={`${fontSizeClasses} font-black text-gray-900 tracking-tight leading-tight text-center max-w-4xl ${minHeightClass} flex items-center justify-center px-4`}
+      >
         <span>{displayedText}</span>
       </div>
       {(hasMultipleResponses || isHistoricalRoom) && (
         <Button
           disabled={isTyping || !hasHydrated}
           variant="outline"
-          className="mt-16"
+          className="mt-8 mb-4"
           onClick={isHistoricalRoom ? handleCreateNewRoom : handleNextResponse}
         >
           {isHistoricalRoom ? (
