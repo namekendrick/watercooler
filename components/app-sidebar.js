@@ -1,7 +1,8 @@
 "use client";
 
-import { X } from "lucide-react";
+import { X, Users } from "lucide-react";
 import { useState } from "react";
+import { toast } from "sonner";
 
 import {
   Sidebar,
@@ -13,6 +14,7 @@ import {
   SidebarMenuItem,
   SidebarMenuButton,
 } from "@/components/ui/sidebar";
+import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useRemoveParticipant } from "@/features/daily/api/use-remove-participant";
 import { useDailyQuestionState } from "@/features/daily/hooks/use-daily-question-state";
@@ -41,6 +43,19 @@ export const AppSidebar = ({ room }) => {
     if (!participant.response?.text) return;
 
     setViewingParticipantId(participant.id);
+  };
+
+  const handleInviteTeam = async () => {
+    const roomUrl = `${window.location.origin}/room/${room.code}`;
+
+    try {
+      await navigator.clipboard.writeText(roomUrl);
+      toast.success("Room link copied to clipboard!", {
+        position: "top-center",
+      });
+    } catch (error) {
+      toast.error("Failed to copy link to clipboard");
+    }
   };
 
   return (
@@ -138,6 +153,19 @@ export const AppSidebar = ({ room }) => {
                     </SidebarMenuItem>
                   );
                 })}
+                {room.participants.length === 1 && !isHistoricalRoom && (
+                  <SidebarMenuItem>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={handleInviteTeam}
+                      className="w-full mt-2 group-data-[collapsible=icon]:hidden"
+                    >
+                      <Users className="mr-1 h-4 w-4" />
+                      Invite Team
+                    </Button>
+                  </SidebarMenuItem>
+                )}
               </SidebarMenu>
             )}
           </SidebarGroupContent>

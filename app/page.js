@@ -32,7 +32,7 @@ export default function Home() {
                 watercooler
               </h1>
               <p className="text-3xl text-gray-600 font-light max-w-lg mx-auto">
-                Daily icebreaker questions for your team
+                A new icebreaker question every day
               </p>
             </div>
             <div className="w-24 h-px bg-gray-400 mx-auto"></div>
@@ -53,7 +53,7 @@ export default function Home() {
                 </Button>
               </div>
               <p className="text-base font-light text-gray-600 mt-2">
-                No account required for participants.
+                Create a room and share the link with your team.
               </p>
             </div>
           </div>
