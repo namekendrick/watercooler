@@ -86,8 +86,14 @@ export const RoomClient = ({ roomCode, defaultOpen }) => {
 
   if (!room) return null;
 
+  const participantsWithResponses = getParticipantsWithResponses(
+    room?.participants || []
+  );
+
+  const hasResponses = participantsWithResponses.length > 0;
+
   const showingParticipantResponse =
-    isViewingParticipantResponse() || isHistoricalRoom;
+    (isViewingParticipantResponse() || isHistoricalRoom) && hasResponses;
 
   const handleBackToQuestion = () => {
     clearViewingParticipant();

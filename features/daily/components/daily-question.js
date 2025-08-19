@@ -1,13 +1,14 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Edit, Send } from "lucide-react";
+import { Edit, Send, Plus } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 
 import { Button } from "@/components/ui/button";
 import { Form, FormControl, FormField, FormItem } from "@/components/ui/form";
 import { Textarea } from "@/components/ui/textarea";
+import { useCreateRoom } from "@/features/daily/api/use-create-room";
 import { useSaveResponse } from "@/features/daily/api/use-save-response";
 import { AddParticipantForm } from "@/features/daily/components/add-participant-form";
 import { useDailyQuestionState } from "@/features/daily/hooks/use-daily-question-state";
@@ -19,6 +20,7 @@ export const DailyQuestion = ({ room }) => {
   const { getCurrentParticipantId, isParticipantInRoom, hasHydrated } =
     useDailyQuestionState();
   const { mutate: saveResponseMutation } = useSaveResponse();
+  const { mutate: createRoom, isPending: isCreatingRoom } = useCreateRoom();
   const [isEditing, setIsEditing] = useState(false);
 
   const currentParticipantId = getCurrentParticipantId(room?.code);
@@ -64,6 +66,15 @@ export const DailyQuestion = ({ room }) => {
   };
 
   const handleEditClick = () => setIsEditing(true);
+
+  const handleCreateNewRoom = () => {
+    const currentParticipantId = getCurrentParticipantId(room?.code);
+    const currentParticipant = room?.participants?.find(
+      (p) => p.id === currentParticipantId
+    );
+
+    createRoom({ name: currentParticipant?.name || null });
+  };
 
   if (!question) return null;
 
@@ -129,6 +140,18 @@ export const DailyQuestion = ({ room }) => {
           )}
         </form>
       </Form>
+
+      {isHistoricalRoom && (
+        <Button
+          variant="outline"
+          onClick={handleCreateNewRoom}
+          disabled={isCreatingRoom}
+          className="mt-4"
+        >
+          <Plus className="mr-2 h-4 w-4" />
+          {isCreatingRoom ? "Creating room..." : "Answer today's question"}
+        </Button>
+      )}
     </div>
   );
 };

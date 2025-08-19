@@ -12,7 +12,6 @@ export const createRoom = async (values) => {
     let attempts = 0;
     const maxAttempts = 10;
 
-    // Generate a unique room code
     while (!isCodeUnique && attempts < maxAttempts) {
       roomCode = generateRoomCode();
 
@@ -31,22 +30,24 @@ export const createRoom = async (values) => {
       );
     }
 
-    const room = await prisma.room.create({
-      data: {
-        code: roomCode,
-        participants: {
-          create: {
-            name,
-          },
+    const roomData = { code: roomCode };
+
+    if (name) {
+      roomData.participants = {
+        create: {
+          name,
         },
-      },
+      };
+    }
+
+    const room = await prisma.room.create({
+      data: roomData,
       include: {
         participants: true,
       },
     });
 
-    // Get the created participant (should be the first and only one)
-    const createdParticipant = room.participants[0];
+    const createdParticipant = room.participants[0] || null;
 
     return {
       status: 201,

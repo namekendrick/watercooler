@@ -18,8 +18,9 @@ export const useCreateRoom = () => {
       return response.data;
     },
     onSuccess: (data) => {
-      // Store the participant ID in localStorage
-      setCurrentParticipant(data.participant.id, data.room.code);
+      if (data.participant)
+        setCurrentParticipant(data.participant.id, data.room.code);
+
       router.push(`/room/${data.room.code}`);
     },
   });
