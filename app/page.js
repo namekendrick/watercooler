@@ -1,5 +1,7 @@
 "use client";
 
+import Image from "next/image";
+import Link from "next/link";
 import { useState } from "react";
 
 import { Button } from "@/components/ui/button";
@@ -15,46 +17,43 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen overflow-hidden relative">
-      {/* Animated color blobs */}
-      <div className="absolute inset-0">
-        <div className="absolute top-20 left-20 w-96 h-96 bg-red-400 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-[float_6s_ease-in-out_infinite]"></div>
-        <div className="absolute top-40 right-20 w-[28rem] h-[28rem] bg-blue-400 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-[float_8s_ease-in-out_infinite_reverse]"></div>
-        <div className="absolute bottom-32 left-108 w-[32rem] h-[32rem] bg-green-400 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-[float_7s_ease-in-out_infinite_0.5s]"></div>
+    <div className="h-full relative bg-[#f7edd9]">
+      <Image
+        src="/images/watercoolerbg.png"
+        alt=""
+        className="object-contain"
+        fill
+      />
+
+      <div className="absolute top-6 left-6 z-20">
+        <Link href="/" className="text-xl font-bold">
+          watercooler.
+        </Link>
       </div>
 
-      {/* Content overlay */}
-      <div className="relative z-10 backdrop-blur-sm bg-white/30 min-h-screen flex items-center justify-center">
-        <div className="max-w-4xl w-full px-6">
-          <div className="text-center space-y-16">
-            <div className="space-y-4">
-              <h1 className="text-8xl md:text-[10rem] font-black text-gray-900 tracking-tight leading-none">
-                watercooler
-              </h1>
-              <p className="text-3xl text-gray-600 font-light max-w-lg mx-auto">
-                A new icebreaker question every day
-              </p>
-            </div>
-            <div className="w-24 h-px bg-gray-400 mx-auto"></div>
-            <div className="max-w-lg mx-auto">
-              <div className="relative flex items-center bg-white/80 backdrop-blur-sm rounded-md shadow-lg">
+      <div className="relative z-10 flex items-center md:items-baseline justify-center h-full">
+        <div className="max-w-4xl w-full px-6 md:mt-28">
+          <div className="text-center space-y-80">
+            <h1 className="text-5xl md:text-7xl font-black bg-gradient-to-r from-[#3c599d] to-blue-300 bg-clip-text text-transparent tracking-tight">
+              A new icebreaker question every day.
+            </h1>
+            <div className="max-w-4xl mx-auto">
+              <div className="relative flex items-center bg-white/20 backdrop-blur-md rounded-xl shadow-xl border border-white/30 h-20 py-2">
                 <Input
                   placeholder="Enter your name"
-                  className="px-4 shadow-none border-none"
+                  className="px-6 py-4 shadow-none border-none font-bold bg-transparent placeholder:text-gray-600"
+                  style={{ fontSize: "1.25rem" }}
                   disabled={isPending}
                   onChange={(e) => setName(e.target.value)}
                 />
                 <Button
                   onClick={handleCreateRoom}
-                  className="px-8 py-8 rounded-l-none text-base"
+                  className="px-8 py-4 h-full bg-gradient-to-r from-[#3c599d] to-blue-400 hover:from-[#3c599d] hover:to-blue-500 text-white rounded-xl mr-2 text-xl font-bold transition-all duration-200"
                   disabled={isPending}
                 >
-                  Create room
+                  Create Room
                 </Button>
               </div>
-              <p className="text-base font-light text-gray-600 mt-2">
-                Create a room and share the link with your team.
-              </p>
             </div>
           </div>
         </div>
